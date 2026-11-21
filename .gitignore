@@ -1,0 +1,47 @@
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+.venv
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+*.egg-info/
+dist/
+build/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+
+# Local data (never commit uploaded documents or model caches)
+data/
+.data/
+storage/
+*.sqlite3
+.cache/
+
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
+
+# iCloud: real venv lives in .venv.nosync (skipped by iCloud); .venv is a symlink to it
+.venv.nosync/

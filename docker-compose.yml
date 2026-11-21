@@ -1,0 +1,50 @@
+# Local development stack.
+#   Infrastructure only (default):   docker compose up -d
+#   Full stack incl. api/worker/web: docker compose --profile app up -d --build
+name: documind
+
+x-backend-env: &backend-env
+  DOCUMIND_ENVIRONMENT: local
+  DOCUMIND_LOG_JSON: "true"
+  DOCUMIND_DATABASE_URL: postgresql+psycopg://documind_app:${DOCUMIND_APP_PASSWORD:-documind_dev_app}@postgres:5432/documind
+  DOCUMIND_MIGRATION_DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-documind}:${POSTGRES_PASSWORD:-documind_dev_owner}@postgres:5432/documind
+  DOCUMIND_REDIS_URL: redis://redis:6379/0
+  DOCUMIND_STORAGE_LOCAL_ROOT: /data/storage
+  DOCUMIND_JWT_SECRET: ${DOCUMIND_JWT_SECRET:-dev-only-insecure-jwt-secret-change-me-0123456789}
+  GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-documind}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-documind_dev_owner}
+      POSTGRES_DB: documind
+      DOCUMIND_APP_PASSWORD: ${DOCUMIND_APP_PASSWORD:-documind_dev_app}
+    ports:
+      - "${POSTGRES_HOST_PORT:-5433}:5432"   # 5433 avoids clashing with a host Postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./infrastructure/docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d documind"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    ports:
+      - "${REDIS_HOST_PORT:-6380}:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  pgdata:
+  redisdata:

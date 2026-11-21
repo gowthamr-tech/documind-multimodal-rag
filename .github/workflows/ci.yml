@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: documind
+          POSTGRES_PASSWORD: documind_dev_owner
+          POSTGRES_DB: documind
+        ports: ["5433:5432"]
+        options: >-
+          --health-cmd "pg_isready -U documind -d documind"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+      redis:
+        image: redis:7-alpine
+        ports: ["6380:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      PGHOST: localhost
+      PGPORT: "5433"
+      PGPASSWORD: documind_dev_owner
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - name: Create app role, test database and extensions
+        working-directory: .
+        env:
+          POSTGRES_USER: documind
+          POSTGRES_DB: documind
+          DOCUMIND_APP_PASSWORD: documind_dev_app
+        run: bash infrastructure/docker/postgres/init/01-roles.sh
+      - run: uv sync --locked --python 3.12
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run mypy
+      - name: Migrations apply cleanly and match the models
+        run: uv run alembic upgrade head && uv run alembic check
+        env:
+          DOCUMIND_MIGRATION_DATABASE_URL: postgresql+psycopg://documind:documind_dev_owner@localhost:5433/documind
+      - run: uv run pytest --cov=app --cov-report=term-missing
