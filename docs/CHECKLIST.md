@@ -47,7 +47,8 @@ Legend: ✅ done and verified · 🟡 partial · ⬜ not started · ⛔ blocked 
 - ✅ Postgres checkpointing; approvals resume across requests; **security bug found & fixed** (gate used approver role on resume)
 - ✅ `/query`, `/query/compare`, SSE streaming (progress + verified answer), conversations, runs, approvals
 - Streaming design: answers are released only after verification (no unverified tokens are shown).
-## Phase 6 — Frontend ⬜
+## Phase 6 — Frontend 🟡
+- Tracked in the `documind-frontend` repository from 2026-11-21 (ADR 0011).
 ## Phase 7 — Evaluation ⬜
 ## Phase 8 — Deployment ⬜
 

@@ -15,7 +15,7 @@ page-level citations and a verification status. When the evidence is insufficien
 | Ingestion | validate → store original → classify → parse → extract → Document Graph → chunk → embed | Celery workers (`ingest_cpu`, `vlm_io`, `embed` queues) |
 | Knowledge | Immutable originals, versioned derived artifacts, chunks with provenance | PostgreSQL 16 + pgvector + tsvector, object storage (S3 / local) |
 | Reasoning | Supervisor-routed LangGraph agents, deterministic computation, verification | FastAPI process (in-process graph), Postgres checkpointer |
-| Experience | Library, viewer, streaming chat, comparison, evaluation | Next.js (App Router) |
+| Experience | Library, viewer, streaming chat, comparison, evaluation | Next.js (App Router), separate `documind-frontend` repo (ADR 0011) |
 
 The planes communicate only through the database, object storage and the job queue.
 

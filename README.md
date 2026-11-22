@@ -3,7 +3,11 @@
 Multimodal document intelligence: understand, extract, retrieve, compare and reason over enterprise
 documents (PDF, scanned PDF, images, DOCX, XLSX, PPTX), with verifiable, page-level citations.
 
-**Stack:** FastAPI · PostgreSQL + pgvector · Redis + Celery · Docling · LangGraph · Next.js · Gemini
+**Stack:** FastAPI · PostgreSQL + pgvector · Redis + Celery · Docling · LangGraph · Gemini
+
+This repository holds the backend (API, workers, agents), evaluation and infrastructure. The
+Next.js web client lives in its own repository, **`documind-frontend`** (see
+[ADR 0011](docs/adr/0011-separate-frontend-repository.md)).
 
 > **Status: active development.** Phases 1–5 (backend) are implemented and tested; Phase 6
 > (frontend) is in progress; Phases 7–8 (evaluation, AWS deployment) are not started.
@@ -28,7 +32,6 @@ documents (PDF, scanned PDF, images, DOCX, XLSX, PPTX), with verifiable, page-le
 | Area | Result |
 |---|---|
 | Backend | 170 tests passing; ruff + mypy `--strict` clean (`make check`) |
-| Frontend | type-check clean; unit tests passing (`npx vitest run`) |
 | Retrieval | benchmark results in [`evaluation/results/`](evaluation/results/) |
 
 **Known gaps:** the vision-model and LLM agent paths have only been tested against a scripted model.
@@ -53,15 +56,14 @@ docker compose up -d   # Postgres + pgvector, Redis
 make install           # uv sync
 make check             # ruff + mypy (strict) + pytest with coverage
 make run               # http://localhost:8000/api/v1/health/live  ·  docs at /api/v1/docs
-
-cd frontend && npm install && npm run dev   # http://localhost:3000
 ```
+
+For the web UI, start the backend as above and follow the `documind-frontend` README.
 
 ## Repository layout
 
 ```
 backend/         FastAPI app, Celery workers, LangGraph agents, migrations, tests
-frontend/        Next.js app (in progress)
 evaluation/      benchmarks and results
 infrastructure/  docker; AWS / Terraform (Phase 8)
 docs/            architecture, contracts, ADRs, checklist

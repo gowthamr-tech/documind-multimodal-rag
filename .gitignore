@@ -19,12 +19,6 @@ htmlcov/
 dist/
 build/
 
-# Node / Next.js
-node_modules/
-.next/
-out/
-*.tsbuildinfo
-
 # Local data (never commit uploaded documents or model caches)
 data/
 .data/
